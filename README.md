@@ -3,6 +3,10 @@ xarray
 
 The missing array functions you are looking for.
 
+
+[![Build Status](https://travis-ci.org/c9s/xarray.svg)](https://travis-ci.org/c9s/xarray)
+
+
 ### array\_is\_indexed
 
 ```php
