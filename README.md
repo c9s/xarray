@@ -9,7 +9,7 @@ The missing array functions you are looking for.
 bool array_is_indexed(array $array)
 ```
 
-`array_is_assoc` function returns true when all the keys in the given array are
+`array_is_indexed` function returns true when all the keys in the given array are
 long integer keys. (0, 1, 3, 100).
 
 
