@@ -7,7 +7,7 @@ The missing array functions you are looking for.
 [![Build Status](https://travis-ci.org/c9s/xarray.svg)](https://travis-ci.org/c9s/xarray)
 
 
-### array\_is\_indexed
+## array\_is\_indexed
 
 ```php
 bool array_is_indexed(array $array)
@@ -17,7 +17,7 @@ bool array_is_indexed(array $array)
 long integer keys. (0, 1, 3, 100).
 
 
-### array\_is\_assoc
+## array\_is\_assoc
 
 ```php
 bool array_is_assoc(array $array)
@@ -27,7 +27,7 @@ bool array_is_assoc(array $array)
 string type keys. ('foo', 'bar').
 
 
-### array\_keys\_join
+## array\_keys\_join
 
 ```php
 string array_keys_join(array $array, [string $delim])
@@ -36,7 +36,7 @@ string array_keys_join(array $array, [string $delim])
 `array_keys_join` is useful when generating cache keys from array keys, this
 reduces the overhead of using `join('-', array_keys($array));`.
 
-#### Examples
+### Examples
 
 ```php
 echo array_keys_join([ "foo" => 1, "bar" => 123], "-");
@@ -50,7 +50,7 @@ foo-bar
 a-b-c
 ```
 
-### array\_pluck
+## array\_pluck
 
 ```php
 string array_pluck(array $array, [long $key | string $key])
