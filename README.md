@@ -32,8 +32,20 @@ string array_keys_join(array $array, [string $delim])
 `array_keys_join` is useful when generating cache keys from array keys, this
 reduces the overhead of using `join('-', array_keys($array));`.
 
-Examples:
+#### Examples
 
 ```php
 echo array_keys_join([ "foo" => 1, "bar" => 123], "-");
+echo array_keys_join([ "a" => 1, "b" => 123, "c" => "kkk" ], "-");
 ```
+
+Which outputs:
+
+```
+foo-bar
+a-b-c
+```
+
+
+
+
