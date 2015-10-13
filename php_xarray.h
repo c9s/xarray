@@ -14,7 +14,10 @@
 extern zend_module_entry xarray_module_entry;
 
 PHP_FUNCTION(array_is_indexed);
+
 PHP_FUNCTION(array_is_assoc);
+
+PHP_FUNCTION(array_keys_join);
 
 
 
