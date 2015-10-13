@@ -7,9 +7,13 @@ The missing array functions you are looking for.
 [![Build Status](https://travis-ci.org/c9s/xarray.svg)](https://travis-ci.org/c9s/xarray)
 
 
+## Requirement
+
+PHP 5.5.x, 5.6.x
 
 
-## Install
+
+## Installation
 
     phpize
     ./configure
