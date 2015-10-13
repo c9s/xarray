@@ -65,9 +65,9 @@ Extracting element by string key:
 
 ```php
 $a = array(
-    array( 'name' => "John" ),
-    array( 'name' => "Mary" ),
-    array( 'name' => "Lisa" ),
+    array( 'name' => "John", 'phone' => '123456' ),
+    array( 'name' => "Mary", 'phone' => '123457' ),
+    array( 'name' => "Lisa", 'phone' => '123458' ),
 );
 $a = array_pluck($a, 'name');
 print_r($a);
