@@ -106,3 +106,40 @@ Array
     [2] => Lisa
 )
 ```
+
+
+
+## array\_first
+
+```php
+string array_first(array $array, callable $callable)
+```
+
+#### Examples
+
+```php
+$a = array(
+    0 => "John",
+    1 => "Mary",
+    2 => "Lisa",
+);
+$a = array_first($a, function($key, $value) {
+    if ($key !== 1) {
+        return true;
+    }
+    return false;
+});
+print_r($a);
+```
+
+Outputs:
+
+```
+Array
+(
+    [0] => John
+    [1] => Lisa
+)
+```
+
+

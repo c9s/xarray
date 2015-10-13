@@ -30,6 +30,7 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_is_assoc, arginfo_array_target)
     PHP_FE(array_keys_join, arginfo_array_keys_join)
     PHP_FE(array_pluck, arginfo_array_pluck)
+    PHP_FE(array_first, NULL)
     PHP_FE_END
 };
 
@@ -129,6 +130,63 @@ PHP_FUNCTION(array_is_assoc) {
 }
 
 
+
+
+PHP_FUNCTION(array_first) {
+
+    zval *array;
+    zend_fcall_info fci;
+    zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+    zval *default_value;
+
+    zval **args[2];
+    zval *retval;
+
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "af|z", &array, &fci, &fci_cache, &default_value) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    // configure callable parameters
+    fci.retval_ptr_ptr = &retval;
+    fci.param_count = 2;
+    fci.no_separation = 0;
+
+    array_init(return_value);
+
+    HashTable *arr_hash;
+    HashPosition pos;
+    zval **arr_value;
+
+    arr_hash = Z_ARRVAL_P(array);
+
+
+    zval *arr_key = NULL;
+    MAKE_STD_ZVAL(arr_key);
+
+    zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
+    while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
+
+
+        zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
+        args[0] = &arr_key;
+        args[1] = arr_value;
+        fci.params = args;
+
+        if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
+            if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval)) {
+                Z_ADDREF_PP(arr_value);
+                add_next_index_zval(return_value, *arr_value);
+            }
+        }
+        zend_hash_move_forward_ex(arr_hash, &pos);
+    }
+}
+
+
+
+
+
 PHP_FUNCTION(array_pluck) {
     zval *array;
     zval *plurk_key = NULL;
@@ -223,16 +281,14 @@ PHP_FUNCTION(array_keys_join) {
         ZVAL_STRINGL(delim, _IMPL_EMPTY, sizeof(_IMPL_EMPTY) - 1, 0);
     }
 
+    zval *arr_key = NULL;
+    MAKE_STD_ZVAL(arr_key);
 
-    for(zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
+    for (zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
         zend_hash_get_current_data_ex(arr_hash, (void**) &item, &pos) == SUCCESS; 
         zend_hash_move_forward_ex(arr_hash, &pos)) 
     {
-
-
-        zval *zkey = NULL;
-        MAKE_STD_ZVAL(zkey);
-        zend_hash_get_current_key_zval_ex(arr_hash, zkey, &pos);
+        zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
 
         /*
         if (zend_hash_get_current_key_ex(arr_hash, &key, &key_len, &num_index, 0, &pos) == HASH_KEY_IS_LONG) {
@@ -240,20 +296,20 @@ PHP_FUNCTION(array_keys_join) {
         }
         */
 
-        switch ((zkey)->type) {
+        switch ((arr_key)->type) {
             case IS_STRING:
-                smart_str_appendl(&implstr, Z_STRVAL_P(zkey), Z_STRLEN_P(zkey));
+                smart_str_appendl(&implstr, Z_STRVAL_P(arr_key), Z_STRLEN_P(arr_key));
                 break;
 
             case IS_LONG: {
                 char stmp[MAX_LENGTH_OF_LONG + 1];
-                str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_LVAL_P(zkey));
+                str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_LVAL_P(arr_key));
                 smart_str_appendl(&implstr, stmp, str_len);
             }
                 break;
 
             case IS_BOOL:
-                if (Z_LVAL_P(zkey) == 1) {
+                if (Z_LVAL_P(arr_key) == 1) {
                     smart_str_appendl(&implstr, "1", sizeof("1")-1);
                 }
                 break;
@@ -263,7 +319,7 @@ PHP_FUNCTION(array_keys_join) {
 
             case IS_DOUBLE: {
                 char *stmp;
-                str_len = spprintf(&stmp, 0, "%.*G", (int) EG(precision), Z_DVAL_P(zkey));
+                str_len = spprintf(&stmp, 0, "%.*G", (int) EG(precision), Z_DVAL_P(arr_key));
                 smart_str_appendl(&implstr, stmp, str_len);
                 efree(stmp);
             }
@@ -272,7 +328,7 @@ PHP_FUNCTION(array_keys_join) {
             case IS_OBJECT: {
                 int copy;
                 zval expr;
-                zend_make_printable_zval(zkey, &expr, &copy);
+                zend_make_printable_zval(arr_key, &expr, &copy);
                 smart_str_appendl(&implstr, Z_STRVAL(expr), Z_STRLEN(expr));
                 if (copy) {
                     zval_dtor(&expr);
@@ -281,7 +337,7 @@ PHP_FUNCTION(array_keys_join) {
                 break;
 
             default:
-                tmp_val = *zkey;
+                tmp_val = *arr_key;
                 zval_copy_ctor(&tmp_val);
                 convert_to_string(&tmp_val);
                 smart_str_appendl(&implstr, Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));

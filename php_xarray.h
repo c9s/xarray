@@ -21,6 +21,8 @@ PHP_FUNCTION(array_keys_join);
 
 PHP_FUNCTION(array_pluck);
 
+PHP_FUNCTION(array_first);
+
 
 
 #endif
