@@ -134,11 +134,15 @@ PHP_FUNCTION(array_keys_join) {
     uint key_len;
     ulong num_index;
 
-    zval *delim;
+    zval *delim = NULL;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "az", &array, &delim) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a|z", &array, &delim) == FAILURE) {
         RETURN_FALSE;
     }
+
+
+
+
 
     HashTable *arr_hash = Z_ARRVAL_P(array);
     HashPosition pos;
@@ -154,6 +158,14 @@ PHP_FUNCTION(array_keys_join) {
     numelems = zend_hash_num_elements(arr_hash);
     if (numelems == 0) {
         RETURN_EMPTY_STRING();
+    }
+
+
+
+    if (delim == NULL) {
+        MAKE_STD_ZVAL(delim);
+#define _IMPL_EMPTY ""
+        ZVAL_STRINGL(delim, _IMPL_EMPTY, sizeof(_IMPL_EMPTY) - 1, 0);
     }
 
 
