@@ -46,7 +46,7 @@ string array_keys_join(array $array, [string $delim])
 `array_keys_join` is useful when generating cache keys from array keys, this
 reduces the overhead of using `join('-', array_keys($array));`.
 
-#### Examples
+##### Examples
 
 ```php
 echo array_keys_join([ "foo" => 1, "bar" => 123], "-");
@@ -68,7 +68,7 @@ string array_pluck(array $array, [long $key | string $key])
 
 `array_pluck` is used for extracting element from array inside the given array.
 
-#### Examples
+##### Examples
 
 Extracting element by string key:
 
@@ -127,7 +127,7 @@ string array_first(array $array, callable $callable)
 
 `array_first` returns the first element in an array passing a given truth test.
 
-#### Examples
+##### Examples
 
 ```php
 $a = array(
