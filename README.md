@@ -50,6 +50,26 @@ foo-bar
 a-b-c
 ```
 
+### array\_pluck
 
+```php
+string array_pluck(array $array, [long $key | string $key])
+```
+
+`array_pluck` is used for extracting element from array inside the given array.
+
+#### Examples
+
+```php
+echo array_keys_join([ "foo" => 1, "bar" => 123], "-");
+echo array_keys_join([ "a" => 1, "b" => 123, "c" => "kkk" ], "-");
+```
+
+Which outputs:
+
+```
+foo-bar
+a-b-c
+```
 
 
