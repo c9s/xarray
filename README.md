@@ -60,16 +60,49 @@ string array_pluck(array $array, [long $key | string $key])
 
 #### Examples
 
+Extracting element by string key:
+
+
 ```php
-echo array_keys_join([ "foo" => 1, "bar" => 123], "-");
-echo array_keys_join([ "a" => 1, "b" => 123, "c" => "kkk" ], "-");
+$a = array(
+    array( 'name' => "John" ),
+    array( 'name' => "Mary" ),
+    array( 'name' => "Lisa" ),
+);
+$a = array_pluck($a, 'name');
+print_r($a);
 ```
 
-Which outputs:
+Outputs:
 
 ```
-foo-bar
-a-b-c
+Array
+(
+    [0] => John
+    [1] => Mary
+    [2] => Lisa
+)
 ```
 
+Extracting element by index key:
 
+```php
+$a = array(
+    array(2 => "John"),
+    array(2 => "Mary"),
+    array(2 => "Lisa"),
+);
+$a = array_pluck($a, 2);
+print_r($a);
+```
+
+Outputs:
+
+```
+Array
+(
+    [0] => John
+    [1] => Mary
+    [2] => Lisa
+)
+```
