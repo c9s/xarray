@@ -11,13 +11,12 @@ ZEND_GET_MODULE(xarray)
 
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_array_target, 0, 0, 2)
-    ZEND_ARG_ARRAY_INFO(0, environment, 0)
-    ZEND_ARG_ARRAY_INFO(0, response, 0)
+    ZEND_ARG_ARRAY_INFO(0, array, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry xarray_functions[] = {
-    PHP_FE(array_is_indexed, NULL)
-    PHP_FE(array_is_assoc, NULL)
+    PHP_FE(array_is_indexed, arginfo_array_target)
+    PHP_FE(array_is_assoc, arginfo_array_target)
     PHP_FE_END
 };
 
