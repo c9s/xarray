@@ -115,6 +115,8 @@ Array
 string array_first(array $array, callable $callable)
 ```
 
+`array_first` returns the first element in an array passing a given truth test.
+
 #### Examples
 
 ```php

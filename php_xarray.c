@@ -15,7 +15,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_target, 0, 0, 1)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_array_keys_join, 0, 0, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_keys_join, 0, 0, 1)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
     ZEND_ARG_INFO(0, delim)
 ZEND_END_ARG_INFO()
@@ -24,6 +24,14 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_pluck, 0, 0, 2)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
     ZEND_ARG_INFO(0, plurk key)
 ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_first, 0, 0, 2)
+    ZEND_ARG_ARRAY_INFO(0, array, 0)
+    ZEND_ARG_INFO(0, callable_tester)
+ZEND_END_ARG_INFO()
+
+
 
 static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_is_indexed, arginfo_array_target)
