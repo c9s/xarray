@@ -44,6 +44,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_build, 0, 0, 2)
     ZEND_ARG_INFO(0, callable_builder)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_remove, 0, 0, 2)
+    ZEND_ARG_ARRAY_INFO(0, array, 1)
+    ZEND_ARG_INFO(0, callable_builder)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_array_keys_prefix, 0, 0, 2)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
     ZEND_ARG_INFO(0, prefix)
@@ -64,6 +69,7 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_first, arginfo_array_first)
     PHP_FE(array_each, arginfo_array_each)
     PHP_FE(array_build, arginfo_array_build)
+    PHP_FE(array_remove, arginfo_array_remove)
     PHP_FE(array_keys_prefix, arginfo_array_keys_prefix)
     PHP_FE(array_add, arginfo_array_add)
     PHP_FE_END
@@ -266,6 +272,61 @@ PHP_FUNCTION(array_build) {
                     Z_ADDREF_PP(new_value);
                     add_index_zval(return_value, Z_LVAL_PP(new_key), *new_value);
 
+                }
+            }
+        }
+        zend_hash_move_forward_ex(arr_hash, &pos);
+    }
+}
+
+
+
+
+PHP_FUNCTION(array_remove) {
+
+    zval *array;
+    zend_fcall_info fci;
+    zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+    zval **args[2];
+    zval *retval;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "af", &array, &fci, &fci_cache) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+
+    // configure callable parameters
+    fci.retval_ptr_ptr = &retval;
+    fci.param_count = 2;
+    fci.no_separation = 0;
+
+    HashTable *arr_hash;
+    HashPosition pos;
+    zval **arr_value;
+
+    arr_hash = Z_ARRVAL_P(array);
+
+    int numelems = zend_hash_num_elements(arr_hash);
+    if (numelems == 0) {
+        return;
+    }
+
+    zval *arr_key = NULL;
+    MAKE_STD_ZVAL(arr_key);
+    zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
+    while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
+        zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
+        args[0] = &arr_key;
+        args[1] = arr_value;
+        fci.params = args;
+
+        if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
+            if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval)) {
+
+                if (Z_TYPE_P(arr_key) == IS_LONG) {
+                    zend_hash_index_del(arr_hash, Z_LVAL_P(arr_key));
+                } else if (Z_TYPE_P(arr_key) == IS_STRING) {
+                    zend_hash_del(arr_hash, Z_STRVAL_P(arr_key), Z_STRLEN_P(arr_key) + 1);
                 }
             }
         }

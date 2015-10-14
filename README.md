@@ -307,6 +307,39 @@ Array
 
 
 
+### array\_remove
+
+```php
+string array_remove(array $array, callable $callback)
+```
+
+`array_remove` remove the element from the given array by the callback.
+
+##### Examples
+
+```php
+$a = array(
+    "foo" => "a",
+    "bar" => "b",
+    "zoo" => "c",
+);
+// delete "foo" key from $a
+array_remove($a, function($key, $value) {
+    return $value === "b";
+});
+print_r($a);
+```
+
+The example above will output:
+
+```
+Array
+(
+    [foo] => a
+    [zoo] => c
+)
+```
+
 
 
 
