@@ -11,7 +11,11 @@ ZEND_GET_MODULE(xarray)
 #endif
 
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_array_target, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_is_assoc, 0, 0, 1)
+    ZEND_ARG_ARRAY_INFO(0, array, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_is_indexed, 0, 0, 1)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
 ZEND_END_ARG_INFO()
 
@@ -25,21 +29,26 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_pluck, 0, 0, 2)
     ZEND_ARG_INFO(0, plurk key)
 ZEND_END_ARG_INFO()
 
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_array_first, 0, 0, 2)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
     ZEND_ARG_INFO(0, callable_tester)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_build, 0, 0, 2)
+    ZEND_ARG_ARRAY_INFO(0, array, 0)
+    ZEND_ARG_INFO(0, callable_builder)
+ZEND_END_ARG_INFO()
+
 
 
 static const zend_function_entry xarray_functions[] = {
-    PHP_FE(array_is_indexed, arginfo_array_target)
-    PHP_FE(array_is_assoc, arginfo_array_target)
+    PHP_FE(array_is_indexed, arginfo_array_is_indexed)
+    PHP_FE(array_is_assoc, arginfo_array_is_assoc)
     PHP_FE(array_keys_join, arginfo_array_keys_join)
     PHP_FE(array_pluck, arginfo_array_pluck)
     PHP_FE(array_first, arginfo_array_first)
     PHP_FE(array_each, NULL)
+    PHP_FE(array_build, arginfo_array_build)
     PHP_FE_END
 };
 
@@ -175,6 +184,77 @@ PHP_FUNCTION(array_each) {
         zend_hash_move_forward_ex(arr_hash, &pos);
     }
 }
+
+
+
+PHP_FUNCTION(array_build) {
+
+    zval *array;
+    zend_fcall_info fci;
+    zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+    zval **args[2];
+    zval *retval;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "af", &array, &fci, &fci_cache) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+
+    // configure callable parameters
+    fci.retval_ptr_ptr = &retval;
+    fci.param_count = 2;
+    fci.no_separation = 0;
+
+
+    HashTable *arr_hash;
+    HashPosition pos;
+    zval **arr_value;
+
+    arr_hash = Z_ARRVAL_P(array);
+
+    array_init(return_value);
+    int numelems = zend_hash_num_elements(arr_hash);
+    if (numelems == 0) {
+        return;
+    }
+
+    zval *arr_key = NULL;
+    MAKE_STD_ZVAL(arr_key);
+    zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
+    while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
+        zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
+        args[0] = &arr_key;
+        args[1] = arr_value;
+        fci.params = args;
+
+        if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
+            if (Z_TYPE_P(retval) == IS_ARRAY) {
+                zval **new_key = NULL;
+                zval **new_value = NULL;
+                if (zend_hash_index_find(Z_ARRVAL_P(retval), 0, (void**) &new_key) == FAILURE) {
+                    continue;
+                }
+                if (zend_hash_index_find(Z_ARRVAL_P(retval), 1, (void**) &new_value) == FAILURE) {
+                    continue;
+                }
+
+                if (Z_TYPE_PP(new_key) == IS_STRING) {
+
+                    Z_ADDREF_PP(new_value);
+                    add_assoc_zval_ex(return_value, Z_STRVAL_PP(new_key), Z_STRLEN_PP(new_key) + 1, *new_value);
+
+                } else if (Z_TYPE_PP(new_key) == IS_LONG) {
+
+                    Z_ADDREF_PP(new_value);
+                    add_index_zval(return_value, Z_LVAL_PP(new_key), *new_value);
+
+                }
+            }
+        }
+        zend_hash_move_forward_ex(arr_hash, &pos);
+    }
+}
+
 
 
 

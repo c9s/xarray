@@ -25,6 +25,8 @@ PHP_FUNCTION(array_first);
 
 PHP_FUNCTION(array_each);
 
+PHP_FUNCTION(array_build);
+
 
 
 #endif
