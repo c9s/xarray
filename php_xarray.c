@@ -241,9 +241,12 @@ PHP_FUNCTION(array_first) {
         zend_hash_move_forward_ex(arr_hash, &pos);
     }
 
-
-    *return_value = *default_value;
-    zval_copy_ctor(return_value);
+    if (default_value) {
+        *return_value = *default_value;
+        zval_copy_ctor(return_value);
+        return;
+    }
+    RETURN_NULL();
 }
 
 
