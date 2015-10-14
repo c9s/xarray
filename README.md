@@ -159,3 +159,82 @@ Array
 ```
 
 
+
+### array\_each
+
+```php
+string array_each(array $array, callable $builder)
+```
+
+`array_each` iterates the array keys and values through a callback.
+
+##### Examples
+
+```php
+$a = array(
+    0 => "John",
+    1 => "Mary",
+    2 => "Lisa",
+);
+$b = [];
+$a = array_each($a, function($key, $value) use(&$b) {
+    $b[$key] = $value;
+});
+print_r($b);
+```
+
+The example above will output:
+
+```
+Array
+(
+    [0] => John
+    [1] => Mary
+    [2] => Lisa
+)
+```
+
+
+
+
+
+
+
+
+
+
+### array\_build
+
+```php
+string array_build(array $array, callable $builder)
+```
+
+`array_build` builds the new array with new keys and new values. 
+
+##### Examples
+
+```php
+$a = array(
+    array("name" => "John", "id" => "j"),
+    array("name" => "Mary", "id" => "m"),
+    array("name" => "Lisa", "id" => "l"),
+);
+$b = array_build($a, function($key, $value) use(&$b) {
+    return array($value['id'], $value['name']);
+});
+print_r($b);
+```
+
+The example above will output:
+
+```
+Array
+(
+    [j] => John
+    [m] => Mary
+    [l] => Lisa
+)
+```
+
+
+
