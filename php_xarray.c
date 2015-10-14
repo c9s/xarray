@@ -44,7 +44,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_build, 0, 0, 2)
     ZEND_ARG_INFO(0, callable_builder)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_array_key_prefix, 0, 0, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_keys_prefix, 0, 0, 2)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
     ZEND_ARG_INFO(0, prefix)
 ZEND_END_ARG_INFO()
@@ -58,7 +58,7 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_first, arginfo_array_first)
     PHP_FE(array_each, arginfo_array_each)
     PHP_FE(array_build, arginfo_array_build)
-    PHP_FE(array_key_prefix, arginfo_array_key_prefix)
+    PHP_FE(array_keys_prefix, arginfo_array_keys_prefix)
     PHP_FE_END
 };
 
@@ -340,7 +340,7 @@ PHP_FUNCTION(array_first) {
 }
 
 
-PHP_FUNCTION(array_key_prefix) {
+PHP_FUNCTION(array_keys_prefix) {
     zval *array;
     char *prefix;
     int prefix_len;

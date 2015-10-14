@@ -239,13 +239,13 @@ Array
 
 
 
-### array\_key_prefix
+### array\_key\_prefix
 
 ```php
-string array_key_prefix(array $array, string $prefix)
+string array_keys_prefix(array $array, string $prefix)
 ```
 
-`array_key_prefix` returns a new array by prepending prefix string from the original keys.
+`array_keys_prefix` returns a new array by prepending prefix string from the original keys.
 
 ##### Examples
 
@@ -255,7 +255,7 @@ $a = array(
     "id" => "j",
     "phone" => "+886975123123",
 );
-$b = array_key_prefix($a, "my_");
+$b = array_keys_prefix($a, "my_");
 print_r($b);
 ```
 
