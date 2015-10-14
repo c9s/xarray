@@ -1,8 +1,8 @@
 --TEST--
-Check array_is_indexed
+Check for non-indexed array
 --FILE--
 <?php
 $ret = array_is_indexed(array( 0 => "a", "foo" => "b" ));
-echo $ret ? "ok\n" : "fail\n";
+echo $ret == false ? "ok" : "fail";
 --EXPECT--
-fail
+ok
