@@ -56,7 +56,7 @@ zend_module_entry xarray_module_entry = {
 #if ZEND_MODULE_API_NO >= 20010901
     STANDARD_MODULE_HEADER,
 #endif
-    "Foo",
+    "xarray",
     xarray_functions, // where you define your functions
     PHP_MINIT(xarray),
     PHP_MSHUTDOWN(xarray),
