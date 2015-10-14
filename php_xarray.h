@@ -27,6 +27,7 @@ PHP_FUNCTION(array_each);
 
 PHP_FUNCTION(array_build);
 
+PHP_FUNCTION(array_key_prefix);
 
 
 #endif

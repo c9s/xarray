@@ -34,11 +34,20 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_first, 0, 0, 2)
     ZEND_ARG_INFO(0, callable_tester)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_each, 0, 0, 2)
+    ZEND_ARG_ARRAY_INFO(0, array, 0)
+    ZEND_ARG_INFO(0, callable)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_array_build, 0, 0, 2)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
     ZEND_ARG_INFO(0, callable_builder)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_key_prefix, 0, 0, 2)
+    ZEND_ARG_ARRAY_INFO(0, array, 0)
+    ZEND_ARG_INFO(0, prefix)
+ZEND_END_ARG_INFO()
 
 
 static const zend_function_entry xarray_functions[] = {
@@ -47,8 +56,9 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_keys_join, arginfo_array_keys_join)
     PHP_FE(array_pluck, arginfo_array_pluck)
     PHP_FE(array_first, arginfo_array_first)
-    PHP_FE(array_each, NULL)
+    PHP_FE(array_each, arginfo_array_each)
     PHP_FE(array_build, arginfo_array_build)
+    PHP_FE(array_key_prefix, arginfo_array_key_prefix)
     PHP_FE_END
 };
 
@@ -328,6 +338,50 @@ PHP_FUNCTION(array_first) {
     }
     RETURN_NULL();
 }
+
+
+PHP_FUNCTION(array_key_prefix) {
+    zval *array;
+    char *prefix;
+    int prefix_len;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "as", &array, &prefix, &prefix_len) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    HashTable *arr_hash = Z_ARRVAL_P(array);
+    HashPosition pos;
+    zval **item;
+    int numelems, i = 0;
+    int str_len;
+
+    numelems = zend_hash_num_elements(arr_hash);
+    if (numelems == 0) {
+        return;
+    }
+
+    zval *arr_key = NULL;
+    MAKE_STD_ZVAL(arr_key);
+
+    array_init(return_value);
+    for (zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
+        zend_hash_get_current_data_ex(arr_hash, (void**) &item, &pos) == SUCCESS; 
+        zend_hash_move_forward_ex(arr_hash, &pos)) 
+    {
+        zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
+        if (Z_TYPE_P(arr_key) == IS_STRING) {
+            smart_str implstr = {0};
+            smart_str_appendl(&implstr, prefix, prefix_len);
+            smart_str_appendl(&implstr, Z_STRVAL_P(arr_key), Z_STRLEN_P(arr_key));
+            smart_str_0(&implstr);
+            add_assoc_zval_ex(return_value, implstr.c, implstr.len, *item);
+        } else {
+            add_index_zval(return_value, Z_LVAL_P(arr_key), *item);
+        }
+    }
+}
+
+
 
 
 

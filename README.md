@@ -9,9 +9,8 @@ The missing array functions you are looking for.
 
 ## Requirement
 
-PHP 5.5.x, 5.6.x
-
-
+- PHP 5.5.x
+- PHP 5.6.x
 
 ## Installation
 
@@ -239,3 +238,34 @@ Array
 
 
 
+
+### array\_key_prefix
+
+```php
+string array_key_prefix(array $array, string $prefix)
+```
+
+`array_key_prefix` returns a new array by prepending prefix string from the original keys.
+
+##### Examples
+
+```php
+$a = array(
+    "name" => "John",
+    "id" => "j",
+    "phone" => "+886975123123",
+);
+$b = array_key_prefix($a, "my_");
+print_r($b);
+```
+
+The example above will output:
+
+```
+Array
+(
+    [my_nam] => John
+    [my_i] => j
+    [my_phon] => +886975123123
+)
+```
