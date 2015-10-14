@@ -29,5 +29,7 @@ PHP_FUNCTION(array_build);
 
 PHP_FUNCTION(array_keys_prefix);
 
+PHP_FUNCTION(array_add);
+
 
 #endif

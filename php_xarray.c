@@ -49,6 +49,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_keys_prefix, 0, 0, 2)
     ZEND_ARG_INFO(0, prefix)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_add, 0, 0, 3)
+    ZEND_ARG_ARRAY_INFO(1, array, 0)
+    ZEND_ARG_INFO(0, key)
+    ZEND_ARG_INFO(0, element)
+ZEND_END_ARG_INFO()
+
 
 static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_is_indexed, arginfo_array_is_indexed)
@@ -59,6 +65,7 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_each, arginfo_array_each)
     PHP_FE(array_build, arginfo_array_build)
     PHP_FE(array_keys_prefix, arginfo_array_keys_prefix)
+    PHP_FE(array_add, arginfo_array_add)
     PHP_FE_END
 };
 
@@ -194,6 +201,7 @@ PHP_FUNCTION(array_each) {
         zend_hash_move_forward_ex(arr_hash, &pos);
     }
 }
+
 
 
 
@@ -458,10 +466,6 @@ PHP_FUNCTION(array_keys_join) {
         RETURN_FALSE;
     }
 
-
-
-
-
     HashTable *arr_hash = Z_ARRVAL_P(array);
     HashPosition pos;
     zval **item;
@@ -564,6 +568,51 @@ PHP_FUNCTION(array_keys_join) {
         RETURN_EMPTY_STRING();
     }
 }
+
+
+
+
+
+
+
+
+PHP_FUNCTION(array_add) {
+    zval *array;
+    zval *new_elem = NULL;
+    zval *key;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "azz", &array, &key, &new_elem) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    HashTable *arr_hash;
+    HashPosition pos;
+    zval **item;
+    zval *tmp;
+    int numelems, i = 0;
+
+    arr_hash = Z_ARRVAL_P(array);
+
+    if (Z_TYPE_P(key) == IS_STRING) {
+        if (zend_hash_find(arr_hash, Z_STRVAL_P(key), Z_STRLEN_P(key) + 1, (void **) &tmp) == FAILURE) {
+
+            Z_ADDREF_P(new_elem);
+            add_assoc_zval_ex(array, Z_STRVAL_P(key), Z_STRLEN_P(key) + 1, new_elem);
+        }
+    } else if (Z_TYPE_P(key) == IS_LONG) {
+        if (zend_hash_index_find(arr_hash, Z_LVAL_P(key), (void **) &tmp) == FAILURE) {
+
+            Z_ADDREF_P(new_elem);
+            add_index_zval(array, Z_LVAL_P(key), new_elem);
+
+        }
+    } else {
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, "array keys must be long or string type.");
+    }
+}
+
+
+
 
 
 
