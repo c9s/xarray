@@ -23,6 +23,8 @@ PHP_FUNCTION(array_pluck);
 
 PHP_FUNCTION(array_first);
 
+PHP_FUNCTION(array_each);
+
 
 
 #endif

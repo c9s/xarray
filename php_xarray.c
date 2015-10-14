@@ -38,7 +38,8 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_is_assoc, arginfo_array_target)
     PHP_FE(array_keys_join, arginfo_array_keys_join)
     PHP_FE(array_pluck, arginfo_array_pluck)
-    PHP_FE(array_first, NULL)
+    PHP_FE(array_first, arginfo_array_first)
+    PHP_FE(array_each, NULL)
     PHP_FE_END
 };
 
@@ -138,6 +139,47 @@ PHP_FUNCTION(array_is_assoc) {
 }
 
 
+PHP_FUNCTION(array_each) {
+
+    zval *array;
+    zend_fcall_info fci;
+    zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+    zval *default_value;
+
+    zval **args[2];
+    zval *retval;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "af|z", &array, &fci, &fci_cache, &default_value) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    // configure callable parameters
+    fci.retval_ptr_ptr = &retval;
+    fci.param_count = 2;
+    fci.no_separation = 0;
+
+    HashTable *arr_hash;
+    HashPosition pos;
+    zval **arr_value;
+
+    arr_hash = Z_ARRVAL_P(array);
+
+    zval *arr_key = NULL;
+    MAKE_STD_ZVAL(arr_key);
+    zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
+    while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
+        zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
+        args[0] = &arr_key;
+        args[1] = arr_value;
+        fci.params = args;
+        zend_call_function(&fci, &fci_cache TSRMLS_CC);
+        zend_hash_move_forward_ex(arr_hash, &pos);
+    }
+}
+
+
+
+
 
 
 PHP_FUNCTION(array_first) {
@@ -174,8 +216,6 @@ PHP_FUNCTION(array_first) {
 
     zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
     while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
-
-
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
         args[0] = &arr_key;
         args[1] = arr_value;
