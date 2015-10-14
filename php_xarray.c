@@ -203,7 +203,11 @@ PHP_FUNCTION(array_each) {
         args[0] = &arr_key;
         args[1] = arr_value;
         fci.params = args;
-        zend_call_function(&fci, &fci_cache TSRMLS_CC);
+        if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
+            if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval) == 0) {
+                break;
+            }
+        }
         zend_hash_move_forward_ex(arr_hash, &pos);
     }
 }
