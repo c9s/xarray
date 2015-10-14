@@ -269,3 +269,13 @@ Array
     [my_phon] => +886975123123
 )
 ```
+
+
+
+
+## FAQ
+
+Q: Why `array_keys_join` and `array_keys_prefix` are named with `keys` in plural.
+
+A: The `keys` means the operation works on multiple keys, not just one of them.
+
