@@ -216,13 +216,15 @@ PHP_FUNCTION(array_pluck) {
         return;
     }
 
-
     zval **tmp;
     if (Z_TYPE_P(plurk_key) == IS_STRING) {
         for (zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
             zend_hash_get_current_data_ex(arr_hash, (void**) &item, &pos) == SUCCESS; 
             zend_hash_move_forward_ex(arr_hash, &pos)) 
         {
+            if (Z_TYPE_PP(item) != IS_ARRAY) {
+                continue;
+            }
             if (zend_hash_find(Z_ARRVAL_PP(item), Z_STRVAL_P(plurk_key), Z_STRLEN_P(plurk_key) + 1, (void **) &tmp) == SUCCESS) {
                 Z_ADDREF_PP(tmp);
                 add_next_index_zval(return_value, *tmp);
@@ -234,6 +236,9 @@ PHP_FUNCTION(array_pluck) {
             zend_hash_get_current_data_ex(arr_hash, (void**) &item, &pos) == SUCCESS; 
             zend_hash_move_forward_ex(arr_hash, &pos)) 
         {
+            if (Z_TYPE_PP(item) != IS_ARRAY) {
+                continue;
+            }
             if (zend_hash_index_find(Z_ARRVAL_PP(item), Z_LVAL_P(plurk_key), (void **) &tmp) == SUCCESS) {
                 Z_ADDREF_PP(tmp);
                 add_next_index_zval(return_value, *tmp);
@@ -351,12 +356,7 @@ PHP_FUNCTION(array_keys_join) {
                 smart_str_appendl(&implstr, Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));
                 zval_dtor(&tmp_val);
                 break;
-
-
-
-
         }
-
 
         if (++i != numelems) {
             smart_str_appendl(&implstr, Z_STRVAL_P(delim), Z_STRLEN_P(delim));
