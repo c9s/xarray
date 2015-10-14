@@ -447,7 +447,7 @@ PHP_FUNCTION(array_keys_prefix) {
             smart_str_appendl(&implstr, prefix, prefix_len);
             smart_str_appendl(&implstr, Z_STRVAL_P(arr_key), Z_STRLEN_P(arr_key));
             smart_str_0(&implstr);
-            add_assoc_zval_ex(return_value, implstr.c, implstr.len, *item);
+            add_assoc_zval_ex(return_value, implstr.c, implstr.len + 1, *item);
         } else {
             add_index_zval(return_value, Z_LVAL_P(arr_key), *item);
         }

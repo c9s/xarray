@@ -12,7 +12,7 @@ print_r($b);
 --EXPECT--
 Array
 (
-    [my_nam] => John
-    [my_i] => j
-    [my_phon] => +886975123123
+    [my_name] => John
+    [my_id] => j
+    [my_phone] => +886975123123
 )
