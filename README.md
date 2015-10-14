@@ -139,10 +139,7 @@ $a = array(
     2 => "Lisa",
 );
 $a = array_first($a, function($key, $value) {
-    if ($key == 1) {
-        return true;
-    }
-    return false;
+    return $key == 1;
 });
 print_r($a);
 ```
@@ -217,7 +214,7 @@ $a = array(
     array("name" => "Lisa", "id" => "l"),
 );
 $b = array();
-array_build($a, function($key, $value) use(&$b) {
+$b = array_build($a, function($key, $value) {
     return array($value['id'], $value['name']);
 });
 print_r($b);
@@ -237,7 +234,7 @@ Array
 
 
 
-### array\_key\_prefix
+### array\_keys\_prefix
 
 ```php
 string array_keys_prefix(array $array, string $prefix)
@@ -262,9 +259,9 @@ The example above will output:
 ```
 Array
 (
-    [my_nam] => John
-    [my_i] => j
-    [my_phon] => +886975123123
+    [my_name] => John
+    [my_id] => j
+    [my_phone] => +886975123123
 )
 ```
 
