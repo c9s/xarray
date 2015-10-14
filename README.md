@@ -219,7 +219,8 @@ $a = array(
     array("name" => "Mary", "id" => "m"),
     array("name" => "Lisa", "id" => "l"),
 );
-$b = array_build($a, function($key, $value) use(&$b) {
+$b = array();
+array_build($a, function($key, $value) use(&$b) {
     return array($value['id'], $value['name']);
 });
 print_r($b);

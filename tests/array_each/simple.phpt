@@ -8,7 +8,7 @@ $a = array(
     2 => "Lisa",
 );
 $b = [];
-$a = array_each($a, function($key, $value) use(&$b) {
+array_each($a, function($key, $value) use(&$b) {
     $b[$key] = $value;
 });
 print_r($b);
