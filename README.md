@@ -273,6 +273,55 @@ Array
 
 
 
+### array\_add
+
+```php
+string array_add(array $array, string|long $key, $elemnt)
+```
+
+`array_add` add the new element into the given array only when the key is not set.
+
+##### Examples
+
+```php
+$a = array(
+    "foo" => "a",
+    "zoo" => "c",
+);
+array_add($a, "bar", "b");
+print_r($a);
+```
+
+The example above will output:
+
+```
+Array
+(
+    [foo] => a
+    [zoo] => c
+    [bar] => b
+)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## FAQ
 
 Q: Why `array_keys_join` and `array_keys_prefix` are named with `keys` in plural.
