@@ -15,8 +15,4 @@ $a = array_first($a, function($key, $value) {
 });
 print_r($a);
 --EXPECT--
-Array
-(
-    [0] => John
-    [1] => Lisa
-)
+John

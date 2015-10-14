@@ -153,7 +153,6 @@ PHP_FUNCTION(array_each) {
         RETURN_FALSE;
     }
 
-    // configure callable parameters
     fci.retval_ptr_ptr = &retval;
     fci.param_count = 2;
     fci.no_separation = 0;
@@ -197,12 +196,12 @@ PHP_FUNCTION(array_first) {
         RETURN_FALSE;
     }
 
+
     // configure callable parameters
     fci.retval_ptr_ptr = &retval;
     fci.param_count = 2;
     fci.no_separation = 0;
 
-    array_init(return_value);
 
     HashTable *arr_hash;
     HashPosition pos;
@@ -210,10 +209,19 @@ PHP_FUNCTION(array_first) {
 
     arr_hash = Z_ARRVAL_P(array);
 
+    int numelems = zend_hash_num_elements(arr_hash);
+    if (numelems == 0) {
+        if (default_value != NULL) {
+            *return_value = *default_value;
+            zval_copy_ctor(return_value);
+        } else {
+            RETURN_NULL();
+        }
+    }
 
     zval *arr_key = NULL;
     MAKE_STD_ZVAL(arr_key);
-
+    // array_init(return_value);
     zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
     while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
@@ -224,11 +232,18 @@ PHP_FUNCTION(array_first) {
         if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
             if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval)) {
                 Z_ADDREF_PP(arr_value);
-                add_next_index_zval(return_value, *arr_value);
+                *return_value = **arr_value;
+                zval_copy_ctor(return_value);
+                return;
+                // add_next_index_zval(return_value, *arr_value);
             }
         }
         zend_hash_move_forward_ex(arr_hash, &pos);
     }
+
+
+    *return_value = *default_value;
+    zval_copy_ctor(return_value);
 }
 
 
