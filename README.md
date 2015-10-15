@@ -162,6 +162,19 @@ string array_each(array $array, callable $builder)
 
 If false value is returned from the callback, the iteration will stop.
 
+##### FAQ
+
+> `array_each` - this is just a foreach with an isolated scope and function
+overhead on every iteration, why would I want that?
+
+`array_each` is pretty much like `array_map` except it doesn't return any value.
+
+Sometimes you want to pass a iteration handler from external, and `array_map`
+is a way to do this, but `array_map` only pass array value to your closure.
+
+`array_each` is faster than `array_map` because it's simpler and it doesn't
+return value.
+
 ##### Examples
 
 ```php
@@ -276,6 +289,34 @@ string array_add(array $array, string|long $key, $elemnt)
 
 `array_add` add the new element into the given array only when the key is not set.
 
+##### FAQ
+
+> `array_add` - why do I need the overhead of a function call, when I can do `$a[*key*] = *value*`
+
+The reason has been described in the document:  array_add only adds data when the key doesn't exist.
+
+You can treat it as a set operation, you used to write:
+
+```php
+$array = [];
+if (!isset($array["key"])) {
+    $array["key"] = 10;
+}
+if (!isset($array["key"])) {
+    $array["key"] = 20;
+}
+```
+
+Now you can write:
+
+```php
+$array = [  ];
+array_add($array, "key", 10);   // key => 10, return true
+array_add($array, "key", 20);   // key => 10 still, return false
+```
+
+
+
 ##### Examples
 
 ```php
@@ -309,6 +350,15 @@ string array_remove(array $array, callable $callback)
 ```
 
 `array_remove` remove the element from the given array by the callback.
+
+##### FAQ
+
+> `array_remove` is just `array_filter`, why do I need another function for that?
+
+`array_filter` only passes value to the callback. in PHP 5.6, there is a new option to pass both key and value,
+however PHP 5.5 doesn't have this option.
+
+Implementing this function in extension make it possible.
 
 ##### Examples
 
@@ -355,4 +405,9 @@ Array
 Q: Why `array_keys_join` and `array_keys_prefix` are named with `keys` in plural.
 
 A: The `keys` means the operation works on multiple keys, not just one of them.
+
+
+
+
+
 
