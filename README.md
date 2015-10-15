@@ -281,6 +281,38 @@ Array
 
 
 
+### array\_keys\_suffix
+
+```php
+string array_keys_suffix(array $array, string $suffix)
+```
+
+`array_keys_suffix` returns a new array by appending suffix string from the original keys.
+
+##### Examples
+
+```php
+$a = array(
+    "create" => 1,
+    "update" => 2,
+);
+$b = array_keys_suffix($a, "_at");
+print_r($b);
+```
+
+The example above will output:
+
+```
+Array
+(
+    [create_at] => 1
+    [update_at] => 2
+)
+```
+
+
+
+
 ### array\_add
 
 ```php
