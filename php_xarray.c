@@ -660,20 +660,21 @@ PHP_FUNCTION(array_add) {
 
     if (Z_TYPE_P(key) == IS_STRING) {
         if (zend_hash_find(arr_hash, Z_STRVAL_P(key), Z_STRLEN_P(key) + 1, (void **) &tmp) == FAILURE) {
-
             Z_ADDREF_P(new_elem);
             add_assoc_zval_ex(array, Z_STRVAL_P(key), Z_STRLEN_P(key) + 1, new_elem);
+            RETURN_TRUE();
         }
     } else if (Z_TYPE_P(key) == IS_LONG) {
         if (zend_hash_index_find(arr_hash, Z_LVAL_P(key), (void **) &tmp) == FAILURE) {
 
             Z_ADDREF_P(new_elem);
             add_index_zval(array, Z_LVAL_P(key), new_elem);
-
+            RETURN_TRUE();
         }
     } else {
         php_error_docref(NULL TSRMLS_CC, E_WARNING, "array keys must be long or string type.");
     }
+    RETURN_FALSE();
 }
 
 
