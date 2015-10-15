@@ -54,6 +54,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_keys_prefix, 0, 0, 2)
     ZEND_ARG_INFO(0, prefix)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_keys_suffix, 0, 0, 2)
+    ZEND_ARG_ARRAY_INFO(0, array, 0)
+    ZEND_ARG_INFO(0, suffix)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_array_add, 0, 0, 3)
     ZEND_ARG_ARRAY_INFO(1, array, 0)
     ZEND_ARG_INFO(0, key)
@@ -71,6 +76,7 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_build, arginfo_array_build)
     PHP_FE(array_remove, arginfo_array_remove)
     PHP_FE(array_keys_prefix, arginfo_array_keys_prefix)
+    PHP_FE(array_keys_suffix, arginfo_array_keys_suffix)
     PHP_FE(array_add, arginfo_array_add)
     PHP_FE_END
 };
@@ -454,6 +460,52 @@ PHP_FUNCTION(array_keys_prefix) {
     }
 }
 
+
+
+
+
+
+PHP_FUNCTION(array_keys_suffix) {
+    zval *array;
+    char *suffix;
+    int suffix_len;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "as", &array, &suffix, &suffix_len) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    HashTable *arr_hash = Z_ARRVAL_P(array);
+    HashPosition pos;
+    zval **item;
+    int numelems, i = 0;
+    int str_len;
+
+    numelems = zend_hash_num_elements(arr_hash);
+    if (numelems == 0) {
+        return;
+    }
+
+    zval *arr_key = NULL;
+    MAKE_STD_ZVAL(arr_key);
+
+    // create new array in return_value
+    array_init(return_value);
+    for (zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
+        zend_hash_get_current_data_ex(arr_hash, (void**) &item, &pos) == SUCCESS; 
+        zend_hash_move_forward_ex(arr_hash, &pos)) 
+    {
+        zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
+        if (Z_TYPE_P(arr_key) == IS_STRING) {
+            smart_str implstr = {0};
+            smart_str_appendl(&implstr, Z_STRVAL_P(arr_key), Z_STRLEN_P(arr_key));
+            smart_str_appendl(&implstr, suffix, suffix_len);
+            smart_str_0(&implstr);
+            add_assoc_zval_ex(return_value, implstr.c, implstr.len + 1, *item);
+        } else {
+            add_index_zval(return_value, Z_LVAL_P(arr_key), *item);
+        }
+    }
+}
 
 
 

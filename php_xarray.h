@@ -31,6 +31,8 @@ PHP_FUNCTION(array_remove);
 
 PHP_FUNCTION(array_keys_prefix);
 
+PHP_FUNCTION(array_keys_suffix);
+
 PHP_FUNCTION(array_add);
 
 
