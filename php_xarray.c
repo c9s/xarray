@@ -494,34 +494,34 @@ PHP_FUNCTION(array_keys_replace) {
     while (SUCCESS == zend_hash_get_current_data_ex(array_hash, (void **) &tmp, &pos)) {
 
         // for string keys, replace it
-        if (zend_hash_get_current_key_ex(array_hash, &str_index, &str_index_len, &num_index, 0, &pos) == HASH_KEY_IS_STRING) {
-            // reset replacemnet hash pointer
-            zend_hash_internal_pointer_reset_ex(replacement_hash, &replacement_pos);
+        if (zend_hash_get_current_key_ex(array_hash, &str_index, &str_index_len, &num_index, 0, &pos) != HASH_KEY_IS_STRING) {
+            continue;
+        }
 
-            zval **replace_value = NULL;
-            while (SUCCESS == zend_hash_get_current_data_ex(replacement_hash, (void **) &replace_value, &replacement_pos)) {
+        // reset replacemnet hash pointer
+        zend_hash_internal_pointer_reset_ex(replacement_hash, &replacement_pos);
 
-                // php_var_dump(replace_value, 1 TSRMLS_CC);
-                char *replace_key;
-                uint  replace_key_len;
-                ulong num_index;
-                if (zend_hash_get_current_key_ex(replacement_hash, &replace_key, &replace_key_len, &num_index, 0, &replacement_pos) == HASH_KEY_IS_STRING) {
-                    zval replace_result;
-                    Z_STRVAL(replace_result) = php_str_to_str_ex(
-                            str_index,
-                            str_index_len,
-                            replace_key,
-                            replace_key_len - 1, // don't include \0
-                            Z_STRVAL_PP(replace_value),
-                            Z_STRLEN_PP(replace_value),
-                            &Z_STRLEN(replace_result),
-                            1, NULL);
-                    Z_ADDREF_PP(tmp);
-                    zend_hash_del(array_hash, str_index, str_index_len);
-                    add_assoc_zval_ex(array, Z_STRVAL(replace_result), Z_STRLEN(replace_result), *tmp);
-                }
-                zend_hash_move_forward_ex(replacement_hash, &replacement_pos);
+        zval **replace_value = NULL;
+        while (SUCCESS == zend_hash_get_current_data_ex(replacement_hash, (void **) &replace_value, &replacement_pos)) {
+            char *replace_key;
+            uint  replace_key_len;
+            ulong num_index;
+            if (zend_hash_get_current_key_ex(replacement_hash, &replace_key, &replace_key_len, &num_index, 0, &replacement_pos) == HASH_KEY_IS_STRING) {
+                zval replace_result;
+                Z_STRVAL(replace_result) = php_str_to_str_ex(
+                        str_index,
+                        str_index_len,
+                        replace_key,
+                        replace_key_len - 1, // don't include \0
+                        Z_STRVAL_PP(replace_value),
+                        Z_STRLEN_PP(replace_value),
+                        &Z_STRLEN(replace_result),
+                        1, NULL);
+                Z_ADDREF_PP(tmp);
+                zend_hash_del(array_hash, str_index, str_index_len);
+                add_assoc_zval_ex(array, Z_STRVAL(replace_result), Z_STRLEN(replace_result), *tmp);
             }
+            zend_hash_move_forward_ex(replacement_hash, &replacement_pos);
         }
         zend_hash_move_forward_ex(array_hash, &pos);
     }
