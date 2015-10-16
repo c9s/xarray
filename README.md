@@ -518,12 +518,12 @@ Array
 ### array\_intval
 
 ```php
-string array_intval(array $array [, int $base])
+array array_intval(array $array [, int $base])
 ```
 
 `array_intval` convert the array values into intval through `intval` function.
 
-
+Return the new array with int values.
 
 ##### Example
 
