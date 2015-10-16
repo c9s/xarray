@@ -333,7 +333,7 @@ Array
 ### array\_keys\_replace
 
 ```php
-array_keys_replace(array & $array, array $replacements [, $options = 0])
+void array_keys_replace(array & $array, array $replacements [, $options = 0])
 ```
 
 Replace all occurrences of the keys in the array with the replacement string
