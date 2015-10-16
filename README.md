@@ -333,10 +333,12 @@ Array
 ### array\_keys\_replace
 
 ```php
-array_keys_replace(array & $array, array $replacements)
+array_keys_replace(array & $array, array $replacements [, $options = 0])
 ```
 
 Replace all occurrences of the keys in the array with the replacement string
+
+`$options` is optional, if `XARRAY_FULLMATCH` is given, only keys full matched will be replaced.
 
 ##### Example
 
