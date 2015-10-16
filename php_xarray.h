@@ -11,6 +11,8 @@
 
 #include <php.h>
 
+#define PHP_XARRAY_FULLMATCH 1
+
 extern zend_module_entry xarray_module_entry;
 
 PHP_FUNCTION(array_is_indexed);

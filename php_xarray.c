@@ -109,6 +109,7 @@ zend_module_entry xarray_module_entry = {
 };
 
 PHP_MINIT_FUNCTION(xarray) {
+    REGISTER_LONG_CONSTANT("XARRAY_FULLMATCH",  PHP_XARRAY_FULLMATCH,  CONST_CS | CONST_PERSISTENT);
     return SUCCESS;
 }
 
@@ -474,8 +475,9 @@ PHP_FUNCTION(array_keys_prefix) {
 PHP_FUNCTION(array_keys_replace) {
     zval *array;
     zval *replacement;
+    long options = 0;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "aa", &array, &replacement) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "aa|l", &array, &replacement, &options) == FAILURE) {
         RETURN_FALSE;
     }
 
@@ -506,20 +508,35 @@ PHP_FUNCTION(array_keys_replace) {
             char *replace_key;
             uint  replace_key_len;
             ulong num_index;
-            if (zend_hash_get_current_key_ex(replacement_hash, &replace_key, &replace_key_len, &num_index, 0, &replacement_pos) == HASH_KEY_IS_STRING) {
-                zval replace_result;
-                Z_STRVAL(replace_result) = php_str_to_str_ex(
-                        str_index,
-                        str_index_len,
-                        replace_key,
-                        replace_key_len - 1, // don't include \0
-                        Z_STRVAL_PP(replace_value),
-                        Z_STRLEN_PP(replace_value),
-                        &Z_STRLEN(replace_result),
-                        1, NULL);
-                Z_ADDREF_PP(tmp);
-                zend_hash_del(array_hash, str_index, str_index_len);
-                add_assoc_zval_ex(array, Z_STRVAL(replace_result), Z_STRLEN(replace_result), *tmp);
+            if (zend_hash_get_current_key_ex(replacement_hash,
+                        &replace_key, &replace_key_len, &num_index, 0,
+                        &replacement_pos) == HASH_KEY_IS_STRING
+            ) {
+
+                if (options == 0) {
+                    zval replace_result;
+                    Z_STRVAL(replace_result) = php_str_to_str_ex(
+                            str_index,
+                            str_index_len,
+                            replace_key,
+                            replace_key_len - 1, // don't include \0
+                            Z_STRVAL_PP(replace_value),
+                            Z_STRLEN_PP(replace_value),
+                            &Z_STRLEN(replace_result),
+                            1, NULL);
+                    Z_ADDREF_PP(tmp);
+                    zend_hash_del(array_hash, str_index, str_index_len);
+                    add_assoc_zval_ex(array, Z_STRVAL(replace_result), Z_STRLEN(replace_result), *tmp);
+                } else if (options & PHP_XARRAY_FULLMATCH) {
+
+                    if (strnatcmp_ex(str_index, str_index_len, replace_key, replace_key_len, 0) == 0) {
+                        Z_ADDREF_PP(tmp);
+                        zend_hash_del(array_hash, str_index, str_index_len);
+                        add_assoc_zval_ex(array, Z_STRVAL_PP(replace_value), Z_STRLEN_PP(replace_value) + 1, *tmp);
+                    }
+
+                }
+
             }
             zend_hash_move_forward_ex(replacement_hash, &replacement_pos);
         }
