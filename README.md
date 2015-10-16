@@ -510,11 +510,40 @@ Array
 
 
 
+## Benchmarks
 
 
+               phparrayindexed      3024 times  0.331036ms/op
+                 xarrayindexed     90108 times  0.011106ms/op
+                   xarrayassoc     63230 times  0.015821ms/op
 
+              phparraykeysjoin     13631 times  0.073684ms/op
+                xarraykeysjoin     21539 times  0.048384ms/op
 
+                 phparraypluck      6185 times  0.163442ms/op
+                   xarraypluck     20788 times  0.049178ms/op
 
+                 phparrayfirst     24618 times  0.040935ms/op
+                   xarrayfirst     80697 times  0.012496ms/op
+
+          phparrayeach_foreach       300 times  3.377887ms/op
+         phparrayeach_arraymap       342 times  2.981806ms/op
+                    xarrayeach       348 times  2.875893ms/op
+
+                 phparraybuild       261 times  3.845187ms/op
+                   xarraybuild       295 times  3.421549ms/op
+
+            phparraykeysprefix      3773 times  0.266558ms/op
+              xarraykeysprefix      8133 times  0.123620ms/op
+
+            phparraykeyssuffix      3644 times  0.277876ms/op
+              xarraykeyssuffix      5147 times  0.194443ms/op
+
+           phparraykeysreplace       674 times  1.514104ms/op
+             xarraykeysreplace    561761 times  0.001782ms/op
+
+                   phparrayadd   1265078 times  0.000795ms/op
+                     xarrayadd    768043 times  0.001321ms/op
 
 
 
