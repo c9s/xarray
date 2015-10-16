@@ -12,6 +12,7 @@
 #include <php.h>
 
 #define PHP_XARRAY_FULLMATCH 1
+#define PHP_XARRAY_PARTIALMATCH (1<<1)
 
 extern zend_module_entry xarray_module_entry;
 
