@@ -550,6 +550,34 @@ Array
 
 
 
+### array\_floatval
+
+```php
+array array_floatval(array $array [, int $base])
+```
+
+`array_doubleval` convert the array values into floatval through `floatval` function.
+
+Return the new array with int values.
+
+##### Example
+
+```php
+$a = array("1.111", "2.222");
+$b = array_floatval($a);
+print_r($b);
+```
+
+The example above will output:
+
+```
+Array
+(
+    [0] => 1.111
+    [1] => 2.222
+)
+```
+
 
 
 
