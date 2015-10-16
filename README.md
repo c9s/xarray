@@ -472,10 +472,11 @@ string array_remove(array $array, callable $callback)
 
 > `array_remove` is just `array_filter`, why do I need another function for that?
 
-`array_filter` only passes value to the callback. in PHP 5.6, there is a new option to pass both key and value,
+In PHP 5.5, `array_filter` only passes value to the callback.  In PHP 5.6, a
+new option was added to support passing both key and value to the callback,
 however PHP 5.5 doesn't have this option.
 
-Implementing this function in extension make it possible.
+Implementing this function in extension makes passing both key, value possible.
 
 ##### Example
 
