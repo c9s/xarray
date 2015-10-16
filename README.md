@@ -1,11 +1,26 @@
 xarray
 ========================================================
 
-The missing array functions you are looking for.
+The missing PHP array functions you are looking for, implemented in extension.
 
+xarray implements the commonly used array functions in extension to improve
+performance and simplify array operations.
+
+If you found any array functions that might be commonly used and can be shared,
+please open a RFC (request for comments) issue. Please note that a RFC document
+should include comprehensive examples including input structure, output
+structure and background.
 
 [![Build Status](https://travis-ci.org/c9s/xarray.svg)](https://travis-ci.org/c9s/xarray)
 
+## Stability
+
+- Release: alpha (The package is ready for testing by hard core users. Features
+  are still being developed, but the program should work. Subsequent releases
+  may have major changes.)
+
+- API: alpha (The API is starting to stabilize, but may still have major
+  changes.)
 
 ## Requirement
 
