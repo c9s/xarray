@@ -2,7 +2,7 @@
 Check array_intval on index array
 --FILE--
 <?php
-$a = array( "1", "2", "3", "10", 100 => "20");
+$a = array( "01", "2", "3", "10", 100 => "20");
 $b = array_intval($a);
 print_r($b);
 foreach ($b as $val) {

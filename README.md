@@ -398,6 +398,11 @@ Array
 
 
 
+
+
+
+
+
 ### array\_add
 
 ```php
@@ -460,6 +465,8 @@ Array
 
 
 
+
+
 ### array\_remove
 
 ```php
@@ -502,6 +509,45 @@ Array
     [zoo] => c
 )
 ```
+
+
+
+
+
+
+### array\_intval
+
+```php
+string array_intval(array $array [, int $base])
+```
+
+`array_intval` convert the array values into intval through `intval` function.
+
+
+
+##### Example
+
+```php
+$a = array( "01", "2", "3", "10", 100 => "20");
+$b = array_intval($a);
+print_r($b);
+```
+
+The example above will output:
+
+```
+Array
+(
+    [0] => 1
+    [1] => 2
+    [2] => 3
+    [3] => 10
+    [4] => 20
+)
+```
+
+
+
 
 
 
