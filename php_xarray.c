@@ -1,6 +1,10 @@
 #include "php_xarray.h"
-#include "Zend/zend_hash.h"
-#include "standard/php_smart_str.h"
+
+#include <stdio.h>
+#include <Zend/zend_hash.h>
+#include <standard/php_smart_str.h>
+#include <standard/php_string.h>
+#include "php_char_to_str.h"
 
 PHP_MINIT_FUNCTION(xarray);
 PHP_MSHUTDOWN_FUNCTION(xarray);
@@ -65,6 +69,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_add, 0, 0, 3)
     ZEND_ARG_INFO(0, element)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_keys_replace, 0, 0, 2)
+    ZEND_ARG_ARRAY_INFO(1, array, 0)
+    ZEND_ARG_INFO(0, replacements)
+ZEND_END_ARG_INFO()
+
 
 static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_is_indexed, arginfo_array_is_indexed)
@@ -78,6 +87,7 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_keys_prefix, arginfo_array_keys_prefix)
     PHP_FE(array_keys_suffix, arginfo_array_keys_suffix)
     PHP_FE(array_add, arginfo_array_add)
+    PHP_FE(array_keys_replace, arginfo_array_keys_replace)
     PHP_FE_END
 };
 
@@ -459,6 +469,65 @@ PHP_FUNCTION(array_keys_prefix) {
         }
     }
 }
+
+
+PHP_FUNCTION(array_keys_replace) {
+    zval *array;
+    zval *replacement;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "aa", &array, &replacement) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+
+    HashTable *array_hash = Z_ARRVAL_P(array);
+    HashPosition pos;
+    HashTable *replacement_hash = Z_ARRVAL_P(replacement);
+    HashPosition replacement_pos;
+
+    zend_hash_internal_pointer_reset_ex(array_hash, &pos);
+    zval **tmp;
+
+    char  *str_index;
+    uint   str_index_len;
+    ulong  num_index;
+    while (SUCCESS == zend_hash_get_current_data_ex(array_hash, (void **) &tmp, &pos)) {
+
+        // for string keys, replace it
+        if (zend_hash_get_current_key_ex(array_hash, &str_index, &str_index_len, &num_index, 0, &pos) == HASH_KEY_IS_STRING) {
+            // reset replacemnet hash pointer
+            zend_hash_internal_pointer_reset_ex(replacement_hash, &replacement_pos);
+
+            zval **replace_value = NULL;
+            while (SUCCESS == zend_hash_get_current_data_ex(replacement_hash, (void **) &replace_value, &replacement_pos)) {
+
+                // php_var_dump(replace_value, 1 TSRMLS_CC);
+                char *replace_key;
+                uint  replace_key_len;
+                ulong num_index;
+                if (zend_hash_get_current_key_ex(replacement_hash, &replace_key, &replace_key_len, &num_index, 0, &replacement_pos) == HASH_KEY_IS_STRING) {
+                    zval replace_result;
+                    Z_STRVAL(replace_result) = php_str_to_str_ex(
+                            str_index,
+                            str_index_len,
+                            replace_key,
+                            replace_key_len - 1, // don't include \0
+                            Z_STRVAL_PP(replace_value),
+                            Z_STRLEN_PP(replace_value),
+                            &Z_STRLEN(replace_result),
+                            1, NULL);
+                    Z_ADDREF_PP(tmp);
+                    zend_hash_del(array_hash, str_index, str_index_len);
+                    add_assoc_zval_ex(array, Z_STRVAL(replace_result), Z_STRLEN(replace_result), *tmp);
+                }
+                zend_hash_move_forward_ex(replacement_hash, &replacement_pos);
+            }
+        }
+        zend_hash_move_forward_ex(array_hash, &pos);
+    }
+}
+
+
 
 
 

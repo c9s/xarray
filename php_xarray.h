@@ -35,5 +35,7 @@ PHP_FUNCTION(array_keys_suffix);
 
 PHP_FUNCTION(array_add);
 
+PHP_FUNCTION(array_keys_replace);
+
 
 #endif

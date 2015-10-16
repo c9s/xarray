@@ -3,6 +3,10 @@
 #include "standard/php_string.h"
 
 
+
+
+
+
 /**
  * Faster php_char_to_str_ex
  */
