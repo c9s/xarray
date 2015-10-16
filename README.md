@@ -22,8 +22,9 @@ structure and background.
 - API: alpha (The API is starting to stabilize, but may still have major
   changes.)
 
-## Requirement
+## Required PHP
 
+- PHP 5.4.x (not tested)
 - PHP 5.5.x
 - PHP 5.6.x
 
@@ -93,6 +94,11 @@ array array_pluck(array $array, [long $key | string $key])
 ```
 
 `array_pluck` is used for extracting element from array inside the given array.
+
+##### Background
+
+`array_column` was implemented in PHP 5.5.x and PHP 7, however if you use PHP
+5.4 or lower, you can install this extension to do the same thing.
 
 ##### Example
 
