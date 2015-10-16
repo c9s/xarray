@@ -100,6 +100,7 @@ array array_pluck(array $array, [long $key | string $key])
 `array_column` was implemented in PHP 5.5.x and PHP 7, however if you use PHP
 5.4 or lower, you can install this extension to do the same thing.
 
+
 ##### Example
 
 Extracting element by string key:
@@ -148,6 +149,10 @@ Array
     [2] => Lisa
 )
 ```
+
+##### See Also
+
+- <http://php.net/manual/en/function.array-column.php>
 
 
 
