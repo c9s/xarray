@@ -48,6 +48,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_intval, 0, 0, 1)
     ZEND_ARG_INFO(0, base)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_array_floatval, 0, 0, 1)
+    ZEND_ARG_ARRAY_INFO(0, array, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_array_build, 0, 0, 2)
     ZEND_ARG_ARRAY_INFO(0, array, 0)
     ZEND_ARG_INFO(0, callable_builder)
@@ -87,13 +91,14 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE(array_pluck, arginfo_array_pluck)
     PHP_FE(array_first, arginfo_array_first)
     PHP_FE(array_each, arginfo_array_each)
-    PHP_FE(array_intval, arginfo_array_intval)
     PHP_FE(array_build, arginfo_array_build)
     PHP_FE(array_remove, arginfo_array_remove)
     PHP_FE(array_keys_prefix, arginfo_array_keys_prefix)
     PHP_FE(array_keys_suffix, arginfo_array_keys_suffix)
     PHP_FE(array_add, arginfo_array_add)
     PHP_FE(array_keys_replace, arginfo_array_keys_replace)
+    PHP_FE(array_intval, arginfo_array_intval)
+    PHP_FE(array_floatval, arginfo_array_floatval)
     PHP_FE_END
 };
 
@@ -238,6 +243,44 @@ PHP_FUNCTION(array_each) {
 
 
 
+
+PHP_FUNCTION(array_floatval) {
+    zval *array;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &array) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    zval **array_value;
+    HashTable *array_hash;
+    HashPosition pos;
+
+    array_hash = Z_ARRVAL_P(array);
+    array_init(return_value);
+    zend_hash_internal_pointer_reset_ex(array_hash, &pos);
+    while (zend_hash_get_current_data_ex(array_hash, (void **)&array_value, &pos) == SUCCESS) {
+        char *string_key;
+        uint  string_key_len;
+        ulong   num_index;
+        switch (zend_hash_get_current_key_ex(array_hash, &string_key, &string_key_len, &num_index, 0, &pos)) {
+            case HASH_KEY_IS_STRING:
+                SEPARATE_ZVAL(array_value);
+                Z_ADDREF_PP(array_value);
+                convert_to_double(*array_value);
+                zend_hash_update(Z_ARRVAL_P(return_value), string_key, string_key_len, array_value, sizeof(zval *), NULL);
+                break;
+            case HASH_KEY_IS_LONG:
+                SEPARATE_ZVAL(array_value);
+                Z_ADDREF_PP(array_value);
+                convert_to_double(*array_value);
+                zend_hash_next_index_insert(Z_ARRVAL_P(return_value), array_value, sizeof(zval *), NULL);
+                break;
+        }
+        zend_hash_move_forward_ex(array_hash, &pos);
+    }
+}
+
+
+
 PHP_FUNCTION(array_intval) {
     zval *array;
     long base = 10;
@@ -245,17 +288,12 @@ PHP_FUNCTION(array_intval) {
         RETURN_FALSE;
     }
 
+    zval **array_value;
     HashTable *array_hash;
     HashPosition pos;
 
-    zval **array_value;
     array_hash = Z_ARRVAL_P(array);
-
-    zval *arr_key = NULL;
-    MAKE_STD_ZVAL(arr_key);
-
     array_init(return_value);
-
     zend_hash_internal_pointer_reset_ex(array_hash, &pos);
     while (zend_hash_get_current_data_ex(array_hash, (void **)&array_value, &pos) == SUCCESS) {
         char *string_key;
@@ -275,10 +313,6 @@ PHP_FUNCTION(array_intval) {
                 zend_hash_next_index_insert(Z_ARRVAL_P(return_value), array_value, sizeof(zval *), NULL);
                 break;
         }
-
-        // if (key_type == 
-        // HASH_KEY_IS_STRING);
-
         zend_hash_move_forward_ex(array_hash, &pos);
     }
 }
