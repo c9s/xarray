@@ -66,7 +66,7 @@ a-b-c
 ### array\_pluck
 
 ```php
-string array_pluck(array $array, [long $key | string $key])
+array array_pluck(array $array, [long $key | string $key])
 ```
 
 `array_pluck` is used for extracting element from array inside the given array.
@@ -125,7 +125,7 @@ Array
 ### array\_first
 
 ```php
-string array_first(array $array, callable $callable)
+mixed array_first(array $array, callable $callable)
 ```
 
 `array_first` returns the first element in an array passing a given truth test.
@@ -155,7 +155,7 @@ Mary
 ### array\_each
 
 ```php
-string array_each(array $array, callable $builder)
+void array_each(array $array, callable $builder)
 ```
 
 `array_each` iterates the array keys and values through a callback.
@@ -213,10 +213,20 @@ Array
 ### array\_build
 
 ```php
-string array_build(array $array, callable $builder)
+array array_build(array $array, callable $builder)
 ```
 
 `array_build` builds the new array with new keys and new values. 
+
+
+##### Builder
+
+The array builder must return a key-value pair to insert a new item.
+If null value or false value is returned, the entry will be ignored.
+
+```php
+list($newKey, $newValue) = $builder($key, $value);
+```
 
 ##### Examples
 
@@ -250,7 +260,7 @@ Array
 ### array\_keys\_prefix
 
 ```php
-string array_keys_prefix(array $array, string $prefix)
+array array_keys_prefix(array $array, string $prefix)
 ```
 
 `array_keys_prefix` returns a new array by prepending prefix string from the original keys.
@@ -284,10 +294,10 @@ Array
 ### array\_keys\_suffix
 
 ```php
-string array_keys_suffix(array $array, string $suffix)
+array array_keys_suffix(array $array, string $suffix)
 ```
 
-`array_keys_suffix` returns a new array by appending suffix string from the original keys.
+Append suffix string to the keys.
 
 ##### Examples
 
@@ -315,10 +325,10 @@ Array
 ### array\_keys\_replace
 
 ```php
-string array_keys_replace(array & $array, array $replacements)
+array_keys_replace(array & $array, array $replacements)
 ```
 
-`array_keys_replace` replace string needle in keys with replacements.
+Replace all occurrences of the keys in the array with the replacement string
 
 ##### Examples
 
