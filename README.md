@@ -49,7 +49,15 @@ string array_keys_join(array $array, [string $delim])
 `array_keys_join` is useful when generating cache keys from array keys, this
 reduces the overhead of using `join('-', array_keys($array));`.
 
-##### Examples
+##### Design
+
+The delimeter argument is in the second position because it's optional.
+
+The built-in functions in PHP like `join($delim, $strings)`, `explode($delim,
+$string)` requires delimeter to join/explode string hence it's better to put
+the delimeter argument in the first position.
+
+##### Example
 
 ```php
 echo array_keys_join([ "foo" => 1, "bar" => 123], "-");
@@ -71,7 +79,7 @@ array array_pluck(array $array, [long $key | string $key])
 
 `array_pluck` is used for extracting element from array inside the given array.
 
-##### Examples
+##### Example
 
 Extracting element by string key:
 
@@ -130,7 +138,7 @@ mixed array_first(array $array, callable $callable)
 
 `array_first` returns the first element in an array passing a given truth test.
 
-##### Examples
+##### Example
 
 ```php
 $a = array(
@@ -175,7 +183,7 @@ is a way to do this, but `array_map` only pass array value to your closure.
 `array_each` is faster than `array_map` because it's simpler and it doesn't
 return value.
 
-##### Examples
+##### Example
 
 ```php
 $a = array(
@@ -228,7 +236,7 @@ If null value or false value is returned, the entry will be ignored.
 list($newKey, $newValue) = $builder($key, $value);
 ```
 
-##### Examples
+##### Example
 
 ```php
 $a = array(
@@ -265,7 +273,7 @@ array array_keys_prefix(array $array, string $prefix)
 
 `array_keys_prefix` returns a new array by prepending prefix string from the original keys.
 
-##### Examples
+##### Example
 
 ```php
 $a = array(
@@ -299,7 +307,7 @@ array array_keys_suffix(array $array, string $suffix)
 
 Append suffix string to the keys.
 
-##### Examples
+##### Example
 
 ```php
 $a = array(
@@ -330,7 +338,7 @@ array_keys_replace(array & $array, array $replacements)
 
 Replace all occurrences of the keys in the array with the replacement string
 
-##### Examples
+##### Example
 
 ```php
 $a = array(
@@ -398,7 +406,7 @@ array_add($array, "key", 20);   // key => 10 still, return false
 
 
 
-##### Examples
+##### Example
 
 ```php
 $a = array(
@@ -441,7 +449,7 @@ however PHP 5.5 doesn't have this option.
 
 Implementing this function in extension make it possible.
 
-##### Examples
+##### Example
 
 ```php
 $a = array(
