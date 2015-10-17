@@ -7,12 +7,12 @@ $a = array(
     1 => "b",
     2 => "c"
 );
-$a = array_first($a, function($key, $value) {
+$b = array_first($a, function($key, $value) {
     if ($value == "d") {
         return true;
     }
     return false;
 });
-print_r($a);
+print_r($b);
 --EXPECT--
 

@@ -9,16 +9,16 @@ $a = array(
     "created_at" => "2012-01-01",
     "updated_at" => "2012-02-02",
 );
-array_keys_replace($a, array(
+$a = array_keys_replace($a, array(
     "_at" => "_on",
 ));
 print_r($a);
 --EXPECT--
 Array
 (
+    [id] => 12345
     [name] => John
     [phone] => +886975123123
     [created_on] => 2012-01-01
     [updated_on] => 2012-02-02
-    [id] => 12345
 )

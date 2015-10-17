@@ -219,20 +219,31 @@ PHP_FUNCTION(array_each) {
     zval **arr_value;
 
     arr_hash = Z_ARRVAL_P(array);
-
-    zval *arr_key = NULL;
-    MAKE_STD_ZVAL(arr_key);
     zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
     while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
+
+        zval *arr_key = NULL;
+        MAKE_STD_ZVAL(arr_key);
+
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
         args[0] = &arr_key;
         args[1] = arr_value;
         fci.params = args;
+
         if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
             if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval) == 0) {
+                if (retval) {
+                    zval_ptr_dtor(&arr_key);
+                    zval_ptr_dtor(&retval);
+                }
                 break;
             }
         }
+        if (retval) {
+            zval_ptr_dtor(&retval);
+        }
+
+        zval_ptr_dtor(&arr_key);
         zend_hash_move_forward_ex(arr_hash, &pos);
     }
 }
@@ -390,10 +401,12 @@ PHP_FUNCTION(array_build) {
         return;
     }
 
-    zval *arr_key = NULL;
-    MAKE_STD_ZVAL(arr_key);
     zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
     while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
+
+        zval *arr_key = NULL;
+        MAKE_STD_ZVAL(arr_key);
+
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
         args[0] = &arr_key;
         args[1] = arr_value;
@@ -404,9 +417,17 @@ PHP_FUNCTION(array_build) {
                 zval **new_key = NULL;
                 zval **new_value = NULL;
                 if (zend_hash_index_find(Z_ARRVAL_P(retval), 0, (void**) &new_key) == FAILURE) {
+                    zval_ptr_dtor(&arr_key);
+                    if (retval) {
+                        zval_ptr_dtor(&retval);
+                    }
                     continue;
                 }
                 if (zend_hash_index_find(Z_ARRVAL_P(retval), 1, (void**) &new_value) == FAILURE) {
+                    zval_ptr_dtor(&arr_key);
+                    if (retval) {
+                        zval_ptr_dtor(&retval);
+                    }
                     continue;
                 }
 
@@ -422,7 +443,12 @@ PHP_FUNCTION(array_build) {
 
                 }
             }
+            if (retval) {
+                zval_ptr_dtor(&retval);
+            }
         }
+
+        zval_ptr_dtor(&arr_key);
         zend_hash_move_forward_ex(arr_hash, &pos);
     }
 }
@@ -459,26 +485,41 @@ PHP_FUNCTION(array_remove) {
         return;
     }
 
-    zval *arr_key = NULL;
-    MAKE_STD_ZVAL(arr_key);
+    array_init(return_value);
     zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
     while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
+
+        zval *arr_key = NULL;
+        MAKE_STD_ZVAL(arr_key);
+
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
         args[0] = &arr_key;
         args[1] = arr_value;
         fci.params = args;
 
-        if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
-            if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval)) {
+        if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS) {
+            if (retval) {
+                if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval) == 1) {
 
-                if (Z_TYPE_P(arr_key) == IS_LONG) {
-                    zend_hash_index_del(arr_hash, Z_LVAL_P(arr_key));
-                } else if (Z_TYPE_P(arr_key) == IS_STRING) {
-                    zend_hash_del(arr_hash, Z_STRVAL_P(arr_key), Z_STRLEN_P(arr_key) + 1);
+                } else {
+                    if (Z_TYPE_P(arr_key) == IS_LONG) {
+
+                        Z_ADDREF_PP(arr_value);
+                        add_index_zval(return_value, Z_LVAL_P(arr_key), *arr_value); 
+
+                    } else if (Z_TYPE_P(arr_key) == IS_STRING) {
+
+                        Z_ADDREF_PP(arr_value);
+                        add_assoc_zval_ex(return_value, Z_STRVAL_P(arr_key), Z_STRLEN_P(arr_key) + 1, *arr_value);
+
+                    }
                 }
+                zval_ptr_dtor(&retval);
             }
+
         }
         zend_hash_move_forward_ex(arr_hash, &pos);
+        zval_ptr_dtor(&arr_key);
     }
 }
 
@@ -521,39 +562,47 @@ PHP_FUNCTION(array_first) {
         if (default_value != NULL) {
             *return_value = *default_value;
             zval_copy_ctor(return_value);
+            return;
         } else {
             RETURN_NULL();
         }
     }
 
-    zval *arr_key = NULL;
-    MAKE_STD_ZVAL(arr_key);
     // array_init(return_value);
     zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
     while (zend_hash_get_current_data_ex(arr_hash, (void **)&arr_value, &pos) == SUCCESS) {
+        zval *arr_key = NULL;
+        MAKE_STD_ZVAL(arr_key);
+
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
         args[0] = &arr_key;
         args[1] = arr_value;
         fci.params = args;
 
-        if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && retval) {
-            if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval)) {
-                Z_ADDREF_PP(arr_value);
-                *return_value = **arr_value;
-                zval_copy_ctor(return_value);
-                return;
-                // add_next_index_zval(return_value, *arr_value);
+        if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS) { 
+            if (retval) {
+                if (Z_TYPE_P(retval) == IS_BOOL && Z_BVAL_P(retval)) {
+                    *return_value = **arr_value;
+                    zval_copy_ctor(return_value);
+                    zval_ptr_dtor(&retval);
+                    zval_ptr_dtor(&arr_key);
+                    return;
+                    // add_next_index_zval(return_value, *arr_value);
+                }
+                zval_ptr_dtor(&retval);
             }
         }
         zend_hash_move_forward_ex(arr_hash, &pos);
+        zval_ptr_dtor(&arr_key);
     }
 
-    if (default_value) {
+    if (default_value != NULL) {
+        // SEPARATE_ZVAL(&default_value);
         *return_value = *default_value;
         zval_copy_ctor(return_value);
-        return;
+    } else {
+        RETURN_NULL();
     }
-    RETURN_NULL();
 }
 
 
@@ -577,14 +626,14 @@ PHP_FUNCTION(array_keys_prefix) {
         return;
     }
 
-    zval *arr_key = NULL;
-    MAKE_STD_ZVAL(arr_key);
 
     array_init(return_value);
     for (zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
         zend_hash_get_current_data_ex(arr_hash, (void**) &item, &pos) == SUCCESS; 
         zend_hash_move_forward_ex(arr_hash, &pos)) 
     {
+        zval *arr_key = NULL;
+        MAKE_STD_ZVAL(arr_key);
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
         if (Z_TYPE_P(arr_key) == IS_STRING) {
             smart_str implstr = {0};
@@ -592,9 +641,11 @@ PHP_FUNCTION(array_keys_prefix) {
             smart_str_appendl(&implstr, Z_STRVAL_P(arr_key), Z_STRLEN_P(arr_key));
             smart_str_0(&implstr);
             add_assoc_zval_ex(return_value, implstr.c, implstr.len + 1, *item);
+            smart_str_free(&implstr);
         } else {
             add_index_zval(return_value, Z_LVAL_P(arr_key), *item);
         }
+        zval_ptr_dtor(&arr_key);
     }
 }
 
@@ -620,53 +671,61 @@ PHP_FUNCTION(array_keys_replace) {
     char  *str_index;
     uint   str_index_len;
     ulong  num_index;
+
+    array_init(return_value);
     while (SUCCESS == zend_hash_get_current_data_ex(array_hash, (void **) &tmp, &pos)) {
 
         // for string keys, replace it
-        if (zend_hash_get_current_key_ex(array_hash, &str_index, &str_index_len, &num_index, 0, &pos) != HASH_KEY_IS_STRING) {
-            continue;
-        }
+        if (zend_hash_get_current_key_ex(array_hash, &str_index, &str_index_len, &num_index, 0, &pos) == HASH_KEY_IS_STRING) {
 
-        // reset replacemnet hash pointer
-        zend_hash_internal_pointer_reset_ex(replacement_hash, &replacement_pos);
+            // reset replacemnet hash pointer
+            zend_hash_internal_pointer_reset_ex(replacement_hash, &replacement_pos);
 
-        zval **replace_value = NULL;
-        while (SUCCESS == zend_hash_get_current_data_ex(replacement_hash, (void **) &replace_value, &replacement_pos)) {
-            char *replace_key;
-            uint  replace_key_len;
-            ulong num_index;
-            if (zend_hash_get_current_key_ex(replacement_hash,
-                        &replace_key, &replace_key_len, &num_index, 0,
-                        &replacement_pos) == HASH_KEY_IS_STRING
-            ) {
+            zval **replace_value = NULL;
+            while (SUCCESS == zend_hash_get_current_data_ex(replacement_hash, (void **) &replace_value, &replacement_pos)) {
+                char *replace_key = NULL;
+                uint  replace_key_len = 0;
+                ulong num_index;
+                if (zend_hash_get_current_key_ex(replacement_hash,
+                            &replace_key, &replace_key_len, &num_index, 0,
+                            &replacement_pos) == HASH_KEY_IS_STRING
+                ) {
+                    if (options == 0) {
 
-                if (options == 0) {
-                    zval replace_result;
-                    Z_STRVAL(replace_result) = php_str_to_str_ex(
-                            str_index,
-                            str_index_len,
-                            replace_key,
-                            replace_key_len - 1, // don't include \0
-                            Z_STRVAL_PP(replace_value),
-                            Z_STRLEN_PP(replace_value),
-                            &Z_STRLEN(replace_result),
-                            1, NULL);
-                    Z_ADDREF_PP(tmp);
-                    zend_hash_del(array_hash, str_index, str_index_len);
-                    add_assoc_zval_ex(array, Z_STRVAL(replace_result), Z_STRLEN(replace_result), *tmp);
-                } else if (options & PHP_XARRAY_FULLMATCH) {
+                        char *replace_result = NULL;
+                        int   replace_result_len;
+                        replace_result = php_str_to_str_ex(
+                                str_index,
+                                str_index_len,
+                                replace_key,
+                                replace_key_len - 1, // don't include \0
+                                Z_STRVAL_PP(replace_value),
+                                Z_STRLEN_PP(replace_value),
+                                &replace_result_len,
+                                1, NULL);
 
-                    if (strnatcmp_ex(str_index, str_index_len, replace_key, replace_key_len, 0) == 0) {
                         Z_ADDREF_PP(tmp);
-                        zend_hash_del(array_hash, str_index, str_index_len);
-                        add_assoc_zval_ex(array, Z_STRVAL_PP(replace_value), Z_STRLEN_PP(replace_value) + 1, *tmp);
+                        add_assoc_zval_ex(return_value, replace_result, replace_result_len, *tmp);
+                        efree(replace_result);
+
+                    } else if (options & PHP_XARRAY_FULLMATCH) {
+
+                        if (strnatcmp_ex(str_index, str_index_len, replace_key, replace_key_len, 0) == 0) {
+                            Z_ADDREF_PP(tmp);
+                            add_assoc_zval_ex(return_value, Z_STRVAL_PP(replace_value), Z_STRLEN_PP(replace_value) + 1, *tmp);
+                        } else {
+                            Z_ADDREF_PP(tmp);
+                            add_assoc_zval_ex(return_value, str_index, str_index_len, *tmp);
+                        }
+
                     }
-
                 }
-
+                zend_hash_move_forward_ex(replacement_hash, &replacement_pos);
             }
-            zend_hash_move_forward_ex(replacement_hash, &replacement_pos);
+        } else {
+            add_next_index_zval(return_value, *tmp);
         }
+
         zend_hash_move_forward_ex(array_hash, &pos);
     }
 }
@@ -698,15 +757,14 @@ PHP_FUNCTION(array_keys_suffix) {
         return;
     }
 
-    zval *arr_key = NULL;
-    MAKE_STD_ZVAL(arr_key);
-
     // create new array in return_value
     array_init(return_value);
     for (zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
         zend_hash_get_current_data_ex(arr_hash, (void**) &item, &pos) == SUCCESS; 
         zend_hash_move_forward_ex(arr_hash, &pos)) 
     {
+        zval *arr_key = NULL;
+        MAKE_STD_ZVAL(arr_key);
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
         if (Z_TYPE_P(arr_key) == IS_STRING) {
             smart_str implstr = {0};
@@ -714,9 +772,11 @@ PHP_FUNCTION(array_keys_suffix) {
             smart_str_appendl(&implstr, suffix, suffix_len);
             smart_str_0(&implstr);
             add_assoc_zval_ex(return_value, implstr.c, implstr.len + 1, *item);
+            smart_str_free(&implstr);
         } else {
             add_index_zval(return_value, Z_LVAL_P(arr_key), *item);
         }
+        zval_ptr_dtor(&arr_key);
     }
 }
 
@@ -791,9 +851,10 @@ PHP_FUNCTION(array_keys_join) {
     ulong num_index;
 
     zval *delim = NULL;
+    zval *udelim = NULL;
     char default_delim = 0;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a|z", &array, &delim) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a|z", &array, &udelim) == FAILURE) {
         RETURN_FALSE;
     }
 
@@ -815,7 +876,9 @@ PHP_FUNCTION(array_keys_join) {
 
 
 
-    if (delim == NULL) {
+    if (udelim) {
+        delim = udelim;
+    } else {
         MAKE_STD_ZVAL(delim);
 #define _IMPL_EMPTY ""
         ZVAL_STRINGL(delim, _IMPL_EMPTY, sizeof(_IMPL_EMPTY) - 1, 0);
@@ -892,6 +955,10 @@ PHP_FUNCTION(array_keys_join) {
 
     smart_str_0(&implstr);
 
+
+    if (udelim == NULL) {
+        FREE_ZVAL(delim);
+    }
     // zval_dtor(delim);
 
     if (implstr.len) {

@@ -8,7 +8,7 @@ $a = array(
     "zoo" => "c",
 );
 // delete "foo" key from $a
-array_remove($a, function($key, $value) {
+$a = array_remove($a, function($key, $value) {
     return $value === "b";
 });
 print_r($a);
