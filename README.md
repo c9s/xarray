@@ -359,7 +359,7 @@ Array
 ### array\_keys\_replace
 
 ```php
-void array_keys_replace(array & $array, array $replacements [, $options = 0])
+array array_keys_replace(array $array, array $replacements [, $options = 0])
 ```
 
 Replace all occurrences of the keys in the array with the replacement string
@@ -376,7 +376,7 @@ $a = array(
     "created_at" => "2012-01-01",
     "updated_at" => "2012-02-02",
 );
-array_keys_replace($a, array(
+$a = array_keys_replace($a, array(
     "_at" => "_on",
 ));
 print_r($a);
@@ -470,7 +470,7 @@ Array
 ### array\_remove
 
 ```php
-string array_remove(array $array, callable $callback)
+array array_remove(array $array, callable $callback)
 ```
 
 `array_remove` remove the element from the given array by the callback.
@@ -494,7 +494,7 @@ $a = array(
     "zoo" => "c",
 );
 // delete "foo" key from $a
-array_remove($a, function($key, $value) {
+$a = array_remove($a, function($key, $value) {
     return $value === "b";
 });
 print_r($a);
