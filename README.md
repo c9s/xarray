@@ -553,7 +553,7 @@ Array
 ### array\_floatval
 
 ```php
-array array_floatval(array $array [, int $base])
+array array_floatval(array $array)
 ```
 
 `array_doubleval` convert the array values into floatval through `floatval` function.
