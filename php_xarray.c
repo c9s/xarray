@@ -791,6 +791,7 @@ PHP_FUNCTION(array_keys_join) {
     ulong num_index;
 
     zval *delim = NULL;
+    char default_delim = 0;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a|z", &array, &delim) == FAILURE) {
         RETURN_FALSE;
@@ -820,13 +821,13 @@ PHP_FUNCTION(array_keys_join) {
         ZVAL_STRINGL(delim, _IMPL_EMPTY, sizeof(_IMPL_EMPTY) - 1, 0);
     }
 
-    zval *arr_key = NULL;
-    MAKE_STD_ZVAL(arr_key);
 
     for (zend_hash_internal_pointer_reset_ex(arr_hash, &pos);
         zend_hash_get_current_data_ex(arr_hash, (void**) &item, &pos) == SUCCESS; 
         zend_hash_move_forward_ex(arr_hash, &pos)) 
     {
+        zval *arr_key = NULL;
+        MAKE_STD_ZVAL(arr_key);
         zend_hash_get_current_key_zval_ex(arr_hash, arr_key, &pos);
 
         /*
@@ -883,13 +884,15 @@ PHP_FUNCTION(array_keys_join) {
                 zval_dtor(&tmp_val);
                 break;
         }
-
         if (++i != numelems) {
             smart_str_appendl(&implstr, Z_STRVAL_P(delim), Z_STRLEN_P(delim));
         }
+        zval_ptr_dtor(&arr_key);
     }
 
     smart_str_0(&implstr);
+
+    // zval_dtor(delim);
 
     if (implstr.len) {
         RETURN_STRINGL(implstr.c, implstr.len, 0);
