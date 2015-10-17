@@ -7,12 +7,12 @@ $a = array(
     1 => "b",
     2 => "c"
 );
-$a = array_first($a, function($key, $value) {
+$b = array_first($a, function($key, $value) {
     if ($value == "d") {
         return true;
     }
     return false;
-}, "x");
-print_r($a);
+}, "not-found-default");
+print_r($b);
 --EXPECT--
-x
+not-found-default

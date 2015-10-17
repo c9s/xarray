@@ -534,7 +534,7 @@ PHP_FUNCTION(array_first) {
     zval *array;
     zend_fcall_info fci;
     zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
-    zval *default_value;
+    zval *default_value = NULL;
 
     zval **args[2];
     zval *retval;
@@ -596,12 +596,16 @@ PHP_FUNCTION(array_first) {
         zval_ptr_dtor(&arr_key);
     }
 
+
     if (default_value != NULL) {
-        // SEPARATE_ZVAL(&default_value);
         *return_value = *default_value;
         zval_copy_ctor(return_value);
+        return;
+
     } else {
+
         RETURN_NULL();
+
     }
 }
 
