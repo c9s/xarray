@@ -103,9 +103,7 @@ static const zend_function_entry xarray_functions[] = {
 };
 
 zend_module_entry xarray_module_entry = {
-#if ZEND_MODULE_API_NO >= 20010901
     STANDARD_MODULE_HEADER,
-#endif
     "xarray",
     xarray_functions, // where you define your functions
     PHP_MINIT(xarray),
@@ -113,9 +111,7 @@ zend_module_entry xarray_module_entry = {
     NULL, // PHP_RINIT(xarray)
     NULL, // PHP_RSHUTDOWN(xarray)
     PHP_MINFO(xarray),
-#if ZEND_MODULE_API_NO >= 20010901
-    "0.1",
-#endif
+    "0.1.0",
     STANDARD_MODULE_PROPERTIES
 };
 
