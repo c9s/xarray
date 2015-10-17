@@ -254,13 +254,14 @@ PHP_FUNCTION(array_floatval) {
     HashTable *array_hash;
     HashPosition pos;
 
+    char *string_key;
+    uint  string_key_len;
+    ulong   num_index;
+
     array_hash = Z_ARRVAL_P(array);
     array_init(return_value);
     zend_hash_internal_pointer_reset_ex(array_hash, &pos);
     while (zend_hash_get_current_data_ex(array_hash, (void **)&array_value, &pos) == SUCCESS) {
-        char *string_key;
-        uint  string_key_len;
-        ulong   num_index;
         switch (zend_hash_get_current_key_ex(array_hash, &string_key, &string_key_len, &num_index, 0, &pos)) {
             case HASH_KEY_IS_STRING:
                 SEPARATE_ZVAL(array_value);
@@ -292,13 +293,14 @@ PHP_FUNCTION(array_intval) {
     HashTable *array_hash;
     HashPosition pos;
 
+    char *string_key;
+    uint  string_key_len;
+    ulong   num_index;
+
     array_hash = Z_ARRVAL_P(array);
     array_init(return_value);
     zend_hash_internal_pointer_reset_ex(array_hash, &pos);
     while (zend_hash_get_current_data_ex(array_hash, (void **)&array_value, &pos) == SUCCESS) {
-        char *string_key;
-        uint  string_key_len;
-        ulong   num_index;
         switch (zend_hash_get_current_key_ex(array_hash, &string_key, &string_key_len, &num_index, 0, &pos)) {
             case HASH_KEY_IS_STRING:
                 SEPARATE_ZVAL(array_value);
