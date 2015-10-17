@@ -32,6 +32,8 @@ PHP_FUNCTION(array_intval);
 
 PHP_FUNCTION(array_floatval);
 
+PHP_FUNCTION(array_boolval);
+
 PHP_FUNCTION(array_build);
 
 PHP_FUNCTION(array_remove);
