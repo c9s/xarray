@@ -111,7 +111,7 @@ zend_module_entry xarray_module_entry = {
     NULL, // PHP_RINIT(xarray)
     NULL, // PHP_RSHUTDOWN(xarray)
     PHP_MINFO(xarray),
-    "0.1.0",
+    "0.1.1",
     STANDARD_MODULE_PROPERTIES
 };
 
