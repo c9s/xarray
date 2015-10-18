@@ -11,6 +11,7 @@
 
 #include <php.h>
 
+#define XARRAY_VERSION "0.1.1"
 #define PHP_XARRAY_FULLMATCH 1
 #define PHP_XARRAY_PARTIALMATCH (1<<1)
 

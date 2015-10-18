@@ -102,6 +102,7 @@ static const zend_function_entry xarray_functions[] = {
     PHP_FE_END
 };
 
+
 zend_module_entry xarray_module_entry = {
     STANDARD_MODULE_HEADER,
     "xarray",
@@ -111,7 +112,7 @@ zend_module_entry xarray_module_entry = {
     NULL, // PHP_RINIT(xarray)
     NULL, // PHP_RSHUTDOWN(xarray)
     PHP_MINFO(xarray),
-    "0.1.1",
+    XARRAY_VERSION,
     STANDARD_MODULE_PROPERTIES
 };
 
