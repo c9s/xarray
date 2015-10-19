@@ -444,9 +444,7 @@ PHP_FUNCTION(array_build) {
 
                 }
             }
-            if (retval) {
-                zval_ptr_dtor(&retval);
-            }
+            zval_ptr_dtor(&retval);
         }
 
         zval_ptr_dtor(&arr_key);
