@@ -4,6 +4,9 @@ php:
 - 5.6
 - 5.5
 
+env:
+- NO_INTERACTION=1
+
 compiler:
 - gcc
 
